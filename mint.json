@@ -81,6 +81,28 @@
         "api-reference/endpoint/create",
         "api-reference/endpoint/delete"
       ]
+    },
+    {
+      "group": "Notifications",
+      "pages": [
+        "api-reference/notifications/study-streak",
+        "api-reference/notifications/follow",
+        "api-reference/notifications/study-reminder",
+        "api-reference/notifications/create",
+        "api-reference/notifications/scheduled"
+      ]
+    },
+    {
+      "group": "Cards",
+      "pages": [
+        "api-reference/cards/generate-batch",
+        "api-reference/cards/generate-single",
+        "api-reference/cards/review",
+        "api-reference/cards/due",
+        "api-reference/cards/initialize",
+        "api-reference/cards/next",
+        "api-reference/cards/interaction"
+      ]
     }
   ],
   "footerSocials": {

@@ -1,0 +1,22 @@
+---
+title: 'Generate Cards Batch'
+openapi: 'POST /api/cards/generate/batch'
+---
+
+Generate a batch of cards for a user.
+
+### Body Parameters
+
+<ParamField body="user_id" type="string" format="uuid" required>
+  The ID of the user to generate cards for
+</ParamField>
+
+<ParamField body="count" type="integer" default="7">
+  Number of cards to generate
+</ParamField>
+
+### Response
+
+Returns a CardResponse object containing:
+- An array of generated Card objects
+- Error message if something went wrong 

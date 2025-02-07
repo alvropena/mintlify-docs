@@ -1,16 +1,13 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "Language Learning API",
+    "description": "API for managing notifications and cards in a language learning application",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.yourdomain.com"
     }
   ],
   "security": [
@@ -19,72 +16,68 @@
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/api/notifications/study-streak": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Create Study Streak Notification",
+        "description": "Create a notification for a user's study streak achievement",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStudyStreakNotificationRequest"
+              },
+              "examples": {
+                "daily": {
+                  "value": {
+                    "user_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "streak_count": 7,
+                    "streak_type": "daily",
+                    "is_read": false
+                  }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Notification created successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "notification": {
+                      "$ref": "#/components/schemas/Notification"
+                    },
+                    "study_streak": {
+                      "$ref": "#/components/schemas/StudyStreakNotification"
+                    }
+                  }
+                },
+                "example": {
+                  "notification": {
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "user_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "type": "study_streak",
+                    "is_read": false,
+                    "created_at": "2024-02-20T12:00:00Z"
+                  },
+                  "study_streak": {
+                    "notification_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "streak_count": 7,
+                    "streak_type": "daily"
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +89,49 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+    "/api/notifications/follow": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Create Follow Notification",
+        "description": "Create a notification when a user follows another user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFollowNotificationRequest"
+              },
+              "example": {
+                "user_id": "123e4567-e89b-12d3-a456-426614174000",
+                "follower_id": "987fdebc-a89b-12d3-a456-426614174000",
+                "is_read": false
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Notification created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "notification": {
+                      "$ref": "#/components/schemas/Notification"
+                    },
+                    "follow": {
+                      "$ref": "#/components/schemas/FollowNotification"
+                    }
+                  }
+                }
+              }
+            }
           },
-          "400": {
-            "description": "unexpected error",
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -132,54 +146,69 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "NotificationType": {
+        "type": "string",
+        "enum": [
+          "study_streak",
+          "follow",
+          "study_reminder"
+        ]
+      },
+      "CreateStudyStreakNotificationRequest": {
         "type": "object",
+        "required": [
+          "user_id",
+          "streak_count",
+          "streak_type"
+        ],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the user to notify"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "streak_count": {
+            "type": "integer",
+            "description": "The current streak count achieved"
+          },
+          "streak_type": {
+            "type": "string",
+            "description": "The type of streak achieved"
+          },
+          "is_read": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether the notification has been read"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "Notification": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
-          "message": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/NotificationType"
+          },
+          "is_read": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "detail": {
             "type": "string"
           }
         }
